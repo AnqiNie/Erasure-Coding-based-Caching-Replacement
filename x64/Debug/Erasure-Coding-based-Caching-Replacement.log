@@ -1,0 +1,8 @@
+﻿  eccr_lzk_829.cpp
+D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\eccr_lzk_829.cpp(22,26): warning C4838: 从“float”转换到“int”需要收缩转换
+D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\eccr_lzk_829.cpp(22,35): warning C4838: 从“float”转换到“int”需要收缩转换
+D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\eccr_lzk_829.cpp(22,70): warning C4838: 从“float”转换到“int”需要收缩转换
+D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\eccr_lzk_829.cpp(22,89): warning C4838: 从“float”转换到“int”需要收缩转换
+D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\eccr_lzk_829.cpp(23,3): warning C4838: 从“float”转换到“int”需要收缩转换
+D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\eccr_lzk_829.cpp(23,36): warning C4838: 从“float”转换到“int”需要收缩转换
+  Erasure-Coding-based-Caching-Replacement.vcxproj -> D:\work\论文\code\Erasure-Coding-based-Caching-Replacement\x64\Debug\Erasure-Coding-based-Caching-Replacement.exe

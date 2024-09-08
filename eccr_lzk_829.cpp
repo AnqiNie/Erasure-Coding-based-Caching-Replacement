@@ -4,6 +4,8 @@
 //如果不得不破坏完整性 则严格按照贪心
 //被破坏完整性的文件选择从云端下载
 
+//每个文件被分为多少块？？
+
 #include<stdio.h>
 #include<iostream>
 #include <vector>
@@ -16,12 +18,17 @@ int n = 6;
 int m = 3;
 int r = 3;
 
-int lij[5][5];
-int lix[5][6];
+//每个服务器之间延迟情况,不能直接相连的是无穷
+int lij[5][5] = { {0,200,INFINITY,INFINITY,100},{200,0,300,100,200},{INFINITY,300,0,400,INFINITY},
+	{INFINITY,100,400,0,200},{100,200,INFINITY,200,0} };
+int lix[5][6];//是不是想算每个服务器获取不同文件所需延迟？
 int llimit = 300;
-int pix[5][6] = { 0 };
-int qix[5][6] = { 0 };
-int lambda[5][6] = { 0 };
+//文件热度情况
+int pix[5][6] = { {1,2,5,6,9,7},{5,6,3,5,8,7},{5,3,6,9,7,5},{8,6,2,3,3,4},{6,2,6,4,3,1} };
+int qix[5][6] = {0 };
+//服务器上文件缓存情况
+int lambda[5][6] = { {1,0,1,1,1,1},{1,1,1,1,0,1},{1,1,1,0,0,1},{1,1,1,0,1,0},{0,0,1,1,1,0} };
+//可替换文件的目标服务器
 int VD[5] = {0};
 
 void request() {
@@ -41,17 +48,66 @@ void calculate_pq() {
 	return;
 }
 
+//void calculate_lix() {
+//	for (int i = 0; i < 5; i++) {
+//		for (int j = 0; j < 6; j++) {
+//			for (int t = 0; t < 5; t++) {
+//				lix[i][j] = max(lix[i][j], lambda[t][j] * lij[t][j]);
+//			}
+//		}
+//	}
+//	return ;
+//}
+
+
+
+//这个calculate_lix()有问题，每个文件只需要三块就可以恢复，所以不需要找出所有块的最高延迟，只需找出最近三块的最高延迟即可
 void calculate_lix() {
+	int l[5] = { 0 };//用于记录对于服务器i要获取到j文件每一块对应的各个时间延迟
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 6; j++) {
 			for (int t = 0; t < 5; t++) {
-				lix[i][j] = max(lix[i][j], lambda[t][j] * lij[t][j]);
+				if (lambda[t][j] == 0) {
+					l[t] = INFINITY;
+				}
+				else {
+					l[t] = lij[i][t];
+				}
+				
+			}
+			//在数组l【5】中找出最近三块的最高延迟即可，使用选择排序
+			if (lambda[i][j] == 0) {
+				//说明在本地服务器上没有该文件块,选择排序选出三块
+				for (int k = 0; k < 3; k++) {
+					for (int m = k + 1; m < 5; m++) {
+						if (l[k] > l[m]) {
+							int temp = 0;
+							temp = l[k];
+							l[k] = l[m];
+							l[m] = temp;
+						}
+					}
+				}
+				lix[i][j] = l[2];
+			}
+			else {
+				//说明在本地服务器上有该文件块,选择排序选出两块
+				for (int k = 0; k < 2; k++) {
+					for (int m = k + 1; m < 5; m++) {
+						if (l[k] > l[m]) {
+							int temp = 0;
+							temp = l[k];
+							l[k] = l[m];
+							l[m] = temp;
+						}
+					}
+				}
+				lix[i][j] = l[1];
 			}
 		}
 	}
 	return ;
 }
-
 
 
 bool checkforfile(int x) {
@@ -99,28 +155,30 @@ void showout() {
 
 
 int main() {
-	//为了计算方便 先对服务器的网络延迟情况进行一次手动输入
-	cout << "手动输入延迟情况" << endl;
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
-			cin >> lij[i][j];
-		}
-	}
-	//为了计算方便 先对服务器上的文件缓存情况进行一次手动输入
-	cout << "手动输入初始缓存情况" << endl;
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 6; j++) {
-			cin >> lambda[i][j];
-		}
-	}
-	//为了计算方便 先对服务器上的文件热度情况进行一次手动输入
-	cout << "手动输入初始热度情况" << endl;
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 6; j++) {
-			cin >> pix[i][j];
-		}
-	}
+	////为了计算方便 先对服务器的网络延迟情况进行一次手动输入
+	//cout << "手动输入延迟情况" << endl;
+	//for (int i = 0; i < 5; i++) {
+	//	for (int j = 0; j < 5; j++) {
+	//		cin >> lij[i][j];
+	//	}
+	//}
+	////为了计算方便 先对服务器上的文件缓存情况进行一次手动输入
+	//cout << "手动输入初始缓存情况" << endl;
+	//for (int i = 0; i < 5; i++) {
+	//	for (int j = 0; j < 6; j++) {
+	//		cin >> lambda[i][j];
+	//	}
+	//}
+	////为了计算方便 先对服务器上的文件热度情况进行一次手动输入
+	//cout << "手动输入初始热度情况" << endl;
+	//for (int i = 0; i < 5; i++) {
+	//	for (int j = 0; j < 6; j++) {
+	//		cin >> pix[i][j];
+	//	}
+	//}
 
+
+	//这里把数组直接输入，后期针对不同情况改就好，一次次输入有些麻烦
 
 	//接收要求
 	cout << "接受请求" << endl;
